@@ -4,5 +4,5 @@
 *.egg-info
 venv/
 static/css
-static/json/
+static/json
 decky.db

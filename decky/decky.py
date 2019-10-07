@@ -1,6 +1,6 @@
 import os, sqlite3, sass, json, smartypants, re, time
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, Markup, jsonify, Response
 from sassutils.wsgi import SassMiddleware
 from datetime import datetime
@@ -27,11 +27,11 @@ app.config.update(
         USERNAME='admin',
         PASSWORD='default'))
 
-print app.root_path
+print(app.root_path)
 
 @login_manager.user_loader
 def load_user(user_id):
-    print User.get(user_id)
+    print(User.get(user_id))
     return User.get(user_id)
 
 class user(flask_login.UserMixin):
@@ -150,7 +150,7 @@ class Pagination(object):
                    right_current=1,
                    right_edge=1):
         last = 0
-        for num in xrange(1, self.pages + 1):
+        for num in range(1, self.pages + 1):
             if num <= left_edge or \
              (num > self.page - left_current - 1 and \
              num < self.page + right_current) or \
@@ -266,8 +266,8 @@ def format_card(raw_card):
         if field in raw_card:
             out_card[field] = raw_card[field]
             if isinstance(out_card[field], list):
-                out_card[field] = unicode(", ".join([
-                    unicode(out_card[field][x])
+                out_card[field] = str(", ".join([
+                    str(out_card[field][x])
                     for x in range(len(out_card[field]))
                 ]))
         else:
@@ -290,7 +290,7 @@ def initdb_command():
 
 @app.cli.command('reset_decks')
 def initdb_command():
-    warning = raw_input('This will delete all decks. Are you sure? y/n   ')
+    warning = input('This will delete all decks. Are you sure? y/n   ')
     if warning == 'y':
         db = get_db()
         with app.open_resource('schema_decks.sql', mode='r') as f:
@@ -308,7 +308,7 @@ def import_cards():
         if pos_json.endswith('.json')
     ]
     for file in json_files:
-        print file
+        print(file)
         with open(os.path.join(PATH_TO_JSON, file)) as json_file:
             set_data = json.load(json_file)
             for set in set_data:
@@ -319,7 +319,7 @@ def import_cards():
                 db.execute(import_sets_query, \
                 (set["baseSetSize"], \
                 set["block"], \
-                unicode(set["boosterV3"]), \
+                str(set["boosterV3"]), \
                 set["code"], \
                 set["codeV3"], \
                 set["isFoilOnly"], \
@@ -327,15 +327,15 @@ def import_cards():
                 set["keyruneCode"], \
                 set["mcmName"], \
                 set["mcmId"], \
-                unicode(set["meta"]), \
+                str(set["meta"]), \
                 set["mtgoCode"], \
                 set["name"], \
                 set["parentCode"], \
                 set["releaseDate"], \
                 set["tcgplayerGroupId"], \
-                unicode(set["tokens"]), \
+                str(set["tokens"]), \
                 set["totalSetSize"], \
-                unicode(set["translations"]), \
+                str(set["translations"]), \
                 set["type"]))
                 for card in set['cards']:
                     card = format_card(card)
@@ -363,7 +363,7 @@ def import_cards():
                         card["isStarter"], \
                         card["isTimeshifted"], \
                         card["layout"], \
-                        unicode(card["legalities"]), \
+                        str(card["legalities"]), \
                         card["life"], \
                         card["loyalty"], \
                         card["manaCost"], \
@@ -377,9 +377,9 @@ def import_cards():
                         card["originalText"], \
                         card["originalType"], \
                         card["power"], \
-                        unicode(card["prices"]), \
+                        str(card["prices"]), \
                         card["printings"], \
-                        unicode(card["purchaseUrls"]), \
+                        str(card["purchaseUrls"]), \
                         card["rarity"], \
                         set["releaseDate"], \
                         card["rulings"], \
@@ -597,14 +597,14 @@ def card(uuid):
             deck_legality = deck_legality.split(', ')
             legality[deck["id"]] = deck_legality
             makeup[deck["id"]] = deck["makeup"].split(", ")
-            print deck
+            print(deck)
     card_number = card['number']
     # Use card['layout'] instead of this jank
     flip_card_a = False
     flip_card_b = False
-    if re.search('[a]', unicode(card_number)):
+    if re.search('[a]', str(card_number)):
         flip_card_a = True
-    if re.search('[b]', unicode(card_number)):
+    if re.search('[b]', str(card_number)):
         flip_card_b = True
     card_mana = card['manaCost']
     card_mana = card_mana.replace('}{', ' ')
@@ -670,6 +670,8 @@ def deck(id):
     db = get_db()
     cur = db.execute('SELECT * FROM decks WHERE id="' + id + '"')
     deck = cur.fetchone()
+    
+    print(deck['image'])
     if not deck:
         abort(404)
     cur = db.execute(
@@ -768,7 +770,7 @@ def deck(id):
     deck_description = deck["description"]
     # Convert new lines to html line breaks
     deck_description = Markup('</p><p>'.join(deck_description.split('\n')))
-    print commander
+    print(commander)
     return render_template(
         'deck.html',
         lands=lands,
@@ -877,24 +879,19 @@ def builder(id):
         card_data = card_data.fetchall()
         if card_data:
             card_id = ''
-            for card in card_data:
-                card_id = unicode(card[0])
-                card_type = unicode(card[2])
-                card_makeup = unicode(card[3])
-                card_image = unicode(card[4])
-                card_sets[card_image] = unicode(card[1])
-                card_release[card_image] = unicode(card[5])
-                print card_release
-                card_return = json.dumps({
-                    'card_found': True,
-                    'card_id': card_id,
-                    'card_sets': card_sets,
-                    'card_type': card_type,
-                    'card_makeup': card_makeup,
-                    'card_image': card_image,
-                    'card_release': card_release
-                })
-
+            card_return = { 'card_found': True }
+            print(titlecase(card_name) + ' printings:')
+            for i, card in enumerate(card_data, start=0):
+                card_sets[card[0]] = str(card[1])
+                print(str(i) + ': ' + card['setId'] + ' ' + str(card[4]) + ' ' + str(card[0]) + ' ' + card['releaseDate'])
+                card_return[str(i)] = {
+                    'card_id': str(card[0]),
+                    'card_set': card['setId'],
+                    'card_type': str(card[2]),
+                    'card_makeup': str(card[3]),
+                    'card_image': str(card[4]),
+                }
+            print(card_return)
             return card_return
         else:
             card_return = json.dumps({'card_found': False})
@@ -944,7 +941,6 @@ def add_deck():
         deck_makeup_g = (float(deck_makeup.count('G')) / deck_makeup_length) * 100
         deck_makeup = str(deck_makeup_w) + ', ' + str(deck_makeup_u) + ', ' + str(
             deck_makeup_b) + ', ' + str(deck_makeup_r) + ', ' + str(deck_makeup_g)
-        print deck_makeup
     else:
         deck_makeup = "0.0, 0.0, 0.0, 0.0, 0.0"
     # This is based on the Featured image selected while building.
@@ -1018,12 +1014,12 @@ def add_deck():
                         (card_foil, card_featured, card_commander, card))
 
             if deck_id == '':
-                print "Inserted Multiverse ID " + card + " into Deck " + str(
-                    deck_row) + " " + str(quantity) + " times."
+                print("Inserted Multiverse ID " + card + " into Deck " + str(
+                    deck_row) + " " + str(quantity) + " times.")
             else:
-                print "Inserted Multiverse ID " + str(
+                print("Inserted Multiverse ID " + str(
                     card) + " into Deck " + str(deck_id) + " " + str(
-                        quantity) + " times."
+                        quantity) + " times.")
         db.commit()
         return 'success'
     return redirect(url_for('decks'))
