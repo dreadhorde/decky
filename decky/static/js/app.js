@@ -59,7 +59,7 @@ $(function () {
             for (var i = 0; i < Object.keys(card_return).length - 1; i++) {
               sets[i] = card_return[i]['card_set']
             }
-            var newRow = $('<tr class="row-' + card_return[0].card_id + '"><td class="text-right quantity">' + cardQuantity + '</td><td><a href="/card/' + card_return[0].card_id + '" target="_blank" class="tooltip" data-img="' + card_return[0].card_image + '">' + cardName + '</a></td><td><select class="btn" id="select-set-' + card_return[0].card_id + '"></select></td><td>' + card_return[0].card_type + '</td><td><input type="checkbox" id="' + card_return[0].card_id + '"><label for="' + card_return[0].card_id + '"></label></td><td><input type="radio" name="featured" id="' + card_return[0].card_id + 'f"><label for="' + card_return[0].card_id + 'f"></label></td><td><input type="radio" name="commander" id="' + card_return[0].card_id + 'c"><label for="' + card_return[0].card_id + 'c"></label></td><td class="text-center"><a href="" class="delete-card"><svg class="cancel" xmlns="http://www.w3.org/2000/svg"x="0px" y="0px" viewBox="0 0 823.93427 1029.8962375"><title>Cancel</title><path d="m 776.75678,0 c -12.064,0 -24.124,4.608 -33.345,13.828 L 411.94378,345.27301 80.52575,13.879 c -18.443,-18.441 -48.255,-18.441 -66.695,0 -18.441,18.44 -18.441,48.244 0,66.685 l 331.418,331.39601 -331.418,331.399 c -18.441,18.44 -18.441,48.25 0,66.691 9.198,9.198 21.272,13.817 33.347,13.817 12.073,0 24.15,-4.619 33.348,-13.817 l 331.41803,-331.398 331.468,331.445 c 9.197,9.198 21.271,13.82 33.345,13.82 12.074,0 24.101,-4.622 33.346,-13.82 18.442,-18.441 18.442,-48.247 0,-66.687 l -331.464,-331.446 331.464,-331.44501 c 18.442,-18.441 18.442,-48.25 0,-66.691 C 800.88178,4.608 788.81678,0 776.75678,0 Z"/></svg></a></td></tr>');
+            var newRow = $('<tr class="row-' + card_return[0].card_id + '"><td class="text-right quantity">' + cardQuantity + '</td><td><a href="/card/' + card_return[0].card_id + '" target="_blank" class="tooltip" data-img="' + card_return[0].card_image + '">' + cardName + '</a></td><td><select class="btn" id="select-set-' + card_return[0].card_id + '"></select></td><td>' + card_return[0].card_type + '</td><td><input type="checkbox" id="' + card_return[0].card_id + '"><label for="' + card_return[0].card_id + '"></label></td><td><input type="radio" name="featured" id="' + card_return[0].card_id + '_featured"><label for="' + card_return[0].card_id + '_featured"></label></td><td><input type="radio" name="_commander" id="' + card_return[0].card_id + '_commander"><label for="' + card_return[0].card_id + '_commander"></label></td><td class="text-center"><a href="" class="delete-card"><svg class="cancel" xmlns="http://www.w3.org/2000/svg"x="0px" y="0px" viewBox="0 0 823.93427 1029.8962375"><title>Cancel</title><path d="m 776.75678,0 c -12.064,0 -24.124,4.608 -33.345,13.828 L 411.94378,345.27301 80.52575,13.879 c -18.443,-18.441 -48.255,-18.441 -66.695,0 -18.441,18.44 -18.441,48.244 0,66.685 l 331.418,331.39601 -331.418,331.399 c -18.441,18.44 -18.441,48.25 0,66.691 9.198,9.198 21.272,13.817 33.347,13.817 12.073,0 24.15,-4.619 33.348,-13.817 l 331.41803,-331.398 331.468,331.445 c 9.197,9.198 21.271,13.82 33.345,13.82 12.074,0 24.101,-4.622 33.346,-13.82 18.442,-18.441 18.442,-48.247 0,-66.687 l -331.464,-331.446 331.464,-331.44501 c 18.442,-18.441 18.442,-48.25 0,-66.691 C 800.88178,4.608 788.81678,0 776.75678,0 Z"/></svg></a></td></tr>');
             // Add a new row to the builder table
             $('.builder-table tbody').append(newRow);
             if (newRow.is(':first-child')) {
@@ -106,8 +106,8 @@ $(function () {
               card_link.attr('href', "/card/" + selectSet.value);
               card_link.attr('data-img', new_img)
               // Get the associated inputs
-              var featured = $(row).find($('input:radio[id*="f"]'));
-              var commander = $(row).find($('input:radio[id*="c"]'));
+              var featured = $(row).find($('input:radio[id$="_featured"]'));
+              var commander = $(row).find($('input:radio[id$="_commander"]'));
               var foil = $(row).find($('input:checkbox'));
               // Delete the old printing from the deck object
               delete deck.cards[old_row];
@@ -117,10 +117,10 @@ $(function () {
               }
               // Change all of the inputs and their labels to match the new
               // printing
-              $(row).find($('input:radio[id*="f"] + label')).attr('for', selectSet.value + "f");
-              featured.attr('id', selectSet.value + "f");
-              $(row).find($('input:radio[id*="c"] + label')).attr('for', selectSet.value + "c");
-              commander.attr('id', selectSet.value + "c");
+              $(row).find($('input:radio[id$="_featured"] + label')).attr('for', selectSet.value + "_featured");
+              featured.attr('id', selectSet.value + "_featured");
+              $(row).find($('input:radio[id$="_commander"] + label')).attr('for', selectSet.value + "_commander");
+              commander.attr('id', selectSet.value + "_commander");
               $(row).find($('input:checkbox + label')).attr('for', selectSet.value);
               foil.attr('id', selectSet.value);
               // Add the new printing to the deck object
@@ -133,7 +133,6 @@ $(function () {
                 "makeup": card_return[0].card_makeup.split(', '),
                 "image": new_img
               };
-              console.log(deck)
             });
           } else {
             // Add the quantity in the form to the quantity in the table
@@ -175,8 +174,8 @@ $(function () {
     card_link.attr('href', "/card/" + this.value);
     card_link.attr('data-img', this.value);
     // Get the associated inputs
-    var featured = $(row).find($('input:radio[id*="f"]'));
-    var commander = $(row).find($('input:radio[id*="c"]'));
+    var featured = $(row).find($('input:radio[id$="_featured"]'));
+    var commander = $(row).find($('input:radio[id$="_commander"]'));
     var foil = $(row).find($('input:checkbox'));
     // Delete the old printing from the deck object
     delete deck.cards[cardId];
@@ -186,10 +185,10 @@ $(function () {
     }
     // Change all of the inputs and their labels to match the new
     // printing
-    $(row).find($('input:radio[id*="f"] + label')).attr('for', this.value + "f");
-    featured.attr('id', this.value + "f");
-    $(row).find($('input:radio[id*="c"] + label')).attr('for', this.value + "c");
-    commander.attr('id', this.value + "c");
+    $(row).find($('input:radio[id$="_featured"] + label')).attr('for', this.value + "_featured");
+    featured.attr('id', this.value + "_featured");
+    $(row).find($('input:radio[id$="_commander"] + label')).attr('for', this.value + "_commander");
+    commander.attr('id', this.value + "_commander");
     $(row).find($('input:checkbox + label')).attr('for', this.value);
     foil.attr('id', this.value);
     // Add the new printing to the deck object
@@ -233,9 +232,10 @@ $(function () {
     });
 
     // Flag the featured card and the commander in the deck object.
-    var featured = $('input:radio:checked[id*="f"]').attr('id').slice(0,-1);
+    var featured = $('input:radio:checked[id$="_featured"]').attr('id').slice(0,-9);
     deck.cards[featured].featured = true;
-    var commander = $('input:radio:checked[id*="c"]').attr('id').slice(0,-1);
+    var commander = $('input:radio:checked[id$="_commander"]').attr('id').slice(0,-10);
+    console.log(commander)
     deck.cards[commander].commander = true;
     // Should all of these fields be required?
     if (deck.name == "") {
@@ -247,6 +247,7 @@ $(function () {
     } else if (deck.description == "") {
       flash('<strong>Oops!</strong> Looks like your deck doesn\’t have a description.', 'error');
     } else {
+      console.log(deck)
       var cardRequest = $.ajax({
         type: 'POST',
         url: '/add_deck',
