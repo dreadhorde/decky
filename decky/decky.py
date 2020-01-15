@@ -314,7 +314,8 @@ def import_cards():
             for set in set_data:
                 set = set_data[set]
                 set = format_set(set)
-                print('Importing ' + set['name'].encode('utf-8') + '...')
+                print(set['name'])
+                print('Importing ' + set['name'] + '...')
                 import_sets_query = "INSERT INTO 'sets' (baseSetSize, block, boosterV3, code, codeV3, isFoilOnly, isOnlineOnly, keyruneCode, mcmName, mcmId, meta, mtgoCode, name, parentCode, releaseDate, tcgplayerGroupId, tokens, totalSetSize, translations, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
                 db.execute(import_sets_query, \
                 (set["baseSetSize"], \
@@ -401,7 +402,7 @@ def import_cards():
                         card["variations"], \
                         card["watermark"]))
                     db.commit()
-                    print(str(card['multiverseId']) + ' ' + card['name'].encode('utf-8'))
+                    print(str(card['multiverseId']) + ' ' + card['name'])
             print('All cards successfully imported.')
 
 
